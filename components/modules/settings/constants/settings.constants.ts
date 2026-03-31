@@ -27,9 +27,20 @@ export const SETTINGS_NAV_ITEMS: SettingsNavItem[] = [
     icon: 'hugeicons:chat-bot',
     componentKey: SettingsComponentKey.AgentConfig,
   },
-  { name: 'Language & region', icon: 'hugeicons:globe', disable: true },
-  { name: 'Privacy & visibility', icon: 'hugeicons:lock', disable: true },
-  { name: 'Advanced', icon: 'hugeicons:settings-01', disable: true },
+  {
+    name: 'Desktop',
+    icon: 'hugeicons:computer',
+    componentKey: SettingsComponentKey.DesktopConfig,
+    desktopOnly: true,
+  },
+  {
+    name: 'Backup & Restore',
+    icon: 'lucide:hard-drive-download',
+    componentKey: SettingsComponentKey.BackupRestoreConfig,
+  },
+  // { name: 'Language & region', icon: 'hugeicons:globe', disable: true },
+  // { name: 'Privacy & visibility', icon: 'hugeicons:lock', disable: true },
+  // { name: 'Advanced', icon: 'hugeicons:settings-01', disable: true },
 ];
 
 export const TABLE_ROW_HEIGHT_RANGE = {

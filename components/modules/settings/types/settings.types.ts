@@ -1,11 +1,13 @@
 import type { EditorTheme } from '~/components/base/code-editor/constants';
 
 export enum SettingsComponentKey {
+  DesktopConfig = 'DesktopConfig',
   EditorConfig = 'EditorConfig',
   QuickQueryConfig = 'QuickQueryConfig',
   AgentConfig = 'AgentConfig',
   AppearanceConfig = 'AppearanceConfig',
   TableAppearanceConfig = 'TableAppearanceConfig',
+  BackupRestoreConfig = 'BackupRestoreConfig',
 }
 
 export type SettingsNavItem = {
@@ -13,6 +15,7 @@ export type SettingsNavItem = {
   icon: string;
   componentKey?: SettingsComponentKey;
   disable?: boolean;
+  desktopOnly?: boolean;
 };
 
 export enum ThinkingStyle {

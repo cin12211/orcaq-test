@@ -1,38 +1,49 @@
 /**
  * Detect the runtime environment.
- * Provides helpers to identify Electron and PWA contexts.
+ * Provides helpers to identify Tauri and PWA contexts.
  */
 
-export function isElectron(): boolean {
-  // Renderer process
-  if (
-    typeof window !== 'undefined' &&
-    typeof window.process === 'object' &&
-    window.process.type === 'renderer'
-  ) {
-    return true;
+export function isTauri(): boolean {
+  if (typeof window === 'undefined') {
+    return false;
   }
 
-  // Main process
-  if (
-    typeof process !== 'undefined' &&
-    typeof process.versions === 'object' &&
-    !!process.versions.electron
-  ) {
-    return true;
-  }
+  const tauriWindow = window as Window & {
+    __TAURI__?: unknown;
+    __TAURI_INTERNALS__?: unknown;
+  };
 
-  // Detect the user agent when the `nodeIntegration` option is set to true
-  if (
-    typeof navigator === 'object' &&
-    typeof navigator.userAgent === 'string' &&
-    navigator.userAgent.indexOf('Electron') >= 0
-  ) {
-    return true;
-  }
-
-  return false;
+  return (
+    typeof tauriWindow.__TAURI__ === 'object' ||
+    typeof tauriWindow.__TAURI_INTERNALS__ === 'object'
+  );
 }
+
+export function isMacOS(): boolean {
+  if (typeof navigator === 'undefined') {
+    return false;
+  }
+
+  if (
+    typeof navigator.userAgentData === 'object' &&
+    typeof navigator.userAgentData.platform === 'string'
+  ) {
+    return navigator.userAgentData.platform.toLowerCase() === 'macos';
+  }
+
+  return /mac/i.test(navigator.userAgent) || /mac/i.test(navigator.platform);
+}
+
+export const isDesktopApp = (): boolean => isTauri() || isElectron();
+
+export function isElectron(): boolean {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  return typeof (window as Window & { electronAPI?: unknown }).electronAPI === 'object';
+}
+
 
 export const isPWA = (): boolean => {
   if (!!('windowControlsOverlay' in navigator)) {
