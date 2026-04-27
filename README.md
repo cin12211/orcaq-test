@@ -1,13 +1,24 @@
-# <img src="https://orca-q.com/images/logo.png" width="32"> OrcaQ - Next Generation database editor
-
 <div align="center">
 
-[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![npx version](https://img.shields.io/npm/v/orcaq?label=npx)](https://www.npmjs.com/package/orcaq)
-[![Downloads](https://img.shields.io/npm/dm/orcaq?label=downloads)](https://www.npmjs.com/package/orcaq)
-[![GitHub stars](https://img.shields.io/github/stars/cin12211/orca-q?style=social)](https://github.com/cin12211/orca-q/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/cin12211/orca-q)](https://github.com/cin12211/orca-q/issues)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/cin12211/orca-q)](https://github.com/cin12211/orca-q/pulls)
+<div align="center">
+  <a href="https://orca-q.com/">
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcset=".github/images/logo-vertical-dark.png">
+      <source media="(prefers-color-scheme: light)" srcset=".github/images/logo-vertical-light.png">
+      <img alt="OrcaQ Logo" src=".github/images/logo-vertical-dark.png" width="180px">
+    </picture>
+  </a>
+</div>
+
+##### The local-first database platform.
+
+<img src="https://img.shields.io/badge/license-MIT-green" />
+<img src="https://img.shields.io/npm/v/orcaq" />
+<img src="https://img.shields.io/npm/dm/orcaq" />
+<img src="https://img.shields.io/badge/macOS%20%7C%20Linux-supported-blue" />
+<img src="https://img.shields.io/github/stars/cin12211/orca-q?style=social" />
+
+OrcaQ is a modern database tool for querying, exploring, and managing PostgreSQL, MySQL, MariaDB, Oracle, and SQLite — fast, intuitive, and local-first.
 
 </div>
 
