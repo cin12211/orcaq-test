@@ -1,10 +1,7 @@
-import type { Connection, TabView, Workspace } from '../stores';
-import type {
-  RowQueryFile,
-  RowQueryFileContent,
-} from '../stores/useExplorerFileStore';
-import type { QuickQueryLog } from '../stores/useQuickQueryLogs';
-import type { WorkspaceState } from '../stores/useWSStateStore';
+import type { Connection, TabView, Workspace } from '../types/entities';
+import type { RowQueryFile, RowQueryFileContent } from '../types/entities';
+import type { QuickQueryLog } from '../types/entities';
+import type { WorkspaceState } from '../types/entities';
 import type {
   AgentPersistedState,
   AppConfigPersistedState,
@@ -102,15 +99,30 @@ export interface AgentPersistApi {
   delete(): Promise<void>;
 }
 
-// ── Aggregated persist layer ─────────────────────────────────────────
+// ── QueryBuilderState ────────────────────────────────────────────────
+// QB state is persisted directly in localStorage by useTableQueryBuilder.
+// No API layer needed.
 
-export interface PersistApis {
-  appConfigApi: AppConfigPersistApi;
-  agentApi: AgentPersistApi;
-  workspaceApi: WorkspacePersistApi;
-  workspaceStateApi: WorkspaceStatePersistApi;
-  connectionApi: ConnectionPersistApi;
-  tabViewsApi: TabViewsPersistApi;
-  quickQueryLogsApi: QuickQueryLogsPersistApi;
-  rowQueryFilesApi: RowQueryFilesPersistApi;
+export interface EnvironmentTagPersistApi {
+  getAll(): Promise<
+    import('~/components/modules/environment-tag/types/environmentTag.types').EnvironmentTag[]
+  >;
+  getOne(
+    id: string
+  ): Promise<
+    | import('~/components/modules/environment-tag/types/environmentTag.types').EnvironmentTag
+    | null
+  >;
+  create(
+    tag: import('~/components/modules/environment-tag/types/environmentTag.types').EnvironmentTag
+  ): Promise<
+    import('~/components/modules/environment-tag/types/environmentTag.types').EnvironmentTag
+  >;
+  update(
+    tag: import('~/components/modules/environment-tag/types/environmentTag.types').EnvironmentTag
+  ): Promise<
+    | import('~/components/modules/environment-tag/types/environmentTag.types').EnvironmentTag
+    | null
+  >;
+  delete(id: string): Promise<void>;
 }

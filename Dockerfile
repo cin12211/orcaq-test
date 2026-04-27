@@ -23,7 +23,7 @@ ENV PATH="$BUN_INSTALL/bin:$PATH"
 
 # Copy and install dependencies with Bun
 COPY bun.lock package.json ecosystem.config.js ./
-RUN bun install --frozen-lockfile
+RUN bun install --frozen-lockfile --ignore-scripts
 
 # Copy app code and build
 COPY . .
@@ -36,15 +36,10 @@ WORKDIR /app
 COPY --from=builder /app/.output .output
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json .
-# COPY --from=builder /app/ecosystem.config.js .
-
-# Install pm2 globally
-# RUN npm install -g pm2
 
 ENV NODE_ENV=production
-EXPOSE 3000
-
+ENV NITRO_HOST=0.0.0.0
+ENV NITRO_PORT=9432
+EXPOSE 9432
 
 CMD ["node", ".output/server/index.mjs"]
-# CMD ["pm2-runtime","ecosystem.config.js"]
-# CMD ["pm2-runtime", "ecosystem.config.js"]

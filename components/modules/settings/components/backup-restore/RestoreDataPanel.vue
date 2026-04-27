@@ -11,6 +11,8 @@ import {
   isBackupJsonFile,
   useDataImport,
 } from '../../hooks/useDataImport';
+import ImportWarningDialog from './ImportWarningDialog.vue';
+import IncompatibleBackupDialog from './IncompatibleBackupDialog.vue';
 
 type RestoreDataPanelLayout = 'modal' | 'inline';
 type SuccessActionMode = 'reset' | 'emit';
@@ -26,7 +28,7 @@ const props = withDefaults(
     layout: 'inline',
     successActionLabel: 'Dismiss',
     successActionMode: 'reset',
-    jsonPlaceholder: '{"version":1,"persist":{...}}',
+    jsonPlaceholder: '{"persist":{...}}',
   }
 );
 
@@ -37,8 +39,14 @@ const {
   error,
   success,
   progress,
+  showIncompatibleDialog,
+  incompatibleMigrations,
+  showImportWarningDialog,
+  pendingBackupSummary,
   importFromFile,
   importFromText,
+  confirmImport,
+  cancelImportWarning,
   reset,
 } = useDataImport();
 
@@ -85,6 +93,12 @@ const resetState = () => {
 };
 
 const canClose = () => !isImporting.value;
+
+const handleImportWarningOpenChange = (open: boolean) => {
+  if (!open) {
+    cancelImportWarning();
+  }
+};
 
 const handleFileChange = (e: Event) => {
   const file = (e.target as HTMLInputElement).files?.[0];
@@ -274,7 +288,8 @@ defineExpose({
               }}
             </p>
             <p class="text-xs text-muted-foreground mt-0.5">
-              Only .json backup files exported from OrcaQ
+              Only .json backup files exported from OrcaQ. Restore keeps
+              unrelated current data in place.
             </p>
           </div>
         </div>
@@ -404,4 +419,17 @@ defineExpose({
       <span>{{ error }}</span>
     </div>
   </div>
+
+  <IncompatibleBackupDialog
+    v-model:open="showIncompatibleDialog"
+    :unknown-migrations="incompatibleMigrations"
+  />
+
+  <ImportWarningDialog
+    :open="showImportWarningDialog"
+    :summary="pendingBackupSummary"
+    :loading="isImporting"
+    @update:open="handleImportWarningOpenChange"
+    @confirm="confirmImport"
+  />
 </template>

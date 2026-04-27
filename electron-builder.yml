@@ -2,9 +2,13 @@ appId: com.cinny.orcaq
 productName: orcaq
 copyright: Copyright © 2025–2026 Cinny. All rights reserved.
 
+nativeRebuilder: sequential
+
 directories:
   output: out/packages
   buildResources: build
+
+forceCodeSigning: true
 
 # Optimize bundle size
 compression: maximum
@@ -12,8 +16,11 @@ compression: maximum
 # Files to bundle into the app
 files:
   - out/electron/**/*
+  - out/core/**/*
   - '!out/electron/**/*.d.ts'
   - '!out/electron/**/*.map'
+  - '!out/core/**/*.d.ts'
+  - '!out/core/**/*.map'
 
 # Bundle the Nitro runtime binary as extra resource
 extraResources:
@@ -26,13 +33,19 @@ extraResources:
 publish:
   provider: github
   owner: cin12211
-  repo: orcaq-test
+  repo: orca-q
   releaseType: release
 
 # ─── macOS ───────────────────────────────────────────────────────────────────
 mac:
   category: public.app-category.developer-tools
   icon: assets/logos/icon.icns
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  notarize: true
+  preAutoEntitlements: true
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.inherit.plist
   target:
     - target: dmg
       arch:
@@ -42,12 +55,6 @@ mac:
       arch:
         - arm64
         - x64
-  # Uncomment when Apple Developer certs are configured:
-  # hardenedRuntime: true
-  # entitlements: build/entitlements.mac.plist
-  # entitlementsInherit: build/entitlements.mac.plist
-  # gatekeeperAssess: false
-  # identity: null  # Remove when using real cert
 
 dmg:
   contents:
@@ -80,6 +87,7 @@ nsis:
 linux:
   icon: assets/logos/
   category: Development
+  maintainer: Cinny <chinhkhacnguyen29@gmail.com>
   target:
     - target: AppImage
       arch:

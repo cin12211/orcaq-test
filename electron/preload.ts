@@ -1,18 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import type { IpcRendererEvent } from 'electron';
-
-// ─── Types shared with renderer ───────────────────────────────────────────────
-
-type PersistCollection =
-  | 'appConfig'
-  | 'agentState'
-  | 'workspaces'
-  | 'workspaceState'
-  | 'connections'
-  | 'tabViews'
-  | 'quickQueryLogs'
-  | 'rowQueryFiles'
-  | 'rowQueryFileContents';
+import type { ElectronPersistCollection as PersistCollection } from '~/core/storage/idbRegistry';
 
 interface PersistFilter {
   field: string;
@@ -54,6 +42,22 @@ const electronAPI = {
       collection: PersistCollection,
       values: Record<string, unknown>[]
     ) => ipcRenderer.invoke('persist:replace-all', { collection, values }),
+
+    mergeAll: (
+      collection: PersistCollection,
+      values: Record<string, unknown>[]
+    ) => ipcRenderer.invoke('persist:merge-all', { collection, values }),
+
+    getAllPaginated: (
+      collection: PersistCollection,
+      page: number,
+      pageSize: number
+    ) =>
+      ipcRenderer.invoke('persist:get-all-paginated', {
+        collection,
+        page,
+        pageSize,
+      }),
   },
 
   updater: {
@@ -97,8 +101,16 @@ const electronAPI = {
     minimize: () => ipcRenderer.invoke('window:minimize'),
     maximize: () => ipcRenderer.invoke('window:maximize'),
     close: () => ipcRenderer.invoke('window:close'),
+    pickSqliteFile: () => ipcRenderer.invoke('window:pick-sqlite-file'),
     getStoragePath: () => ipcRenderer.invoke('window:get-storage-path'),
     openStoragePath: () => ipcRenderer.invoke('window:open-storage-path'),
+    resetAllData: () => ipcRenderer.invoke('window:reset-all-data'),
+
+    onOpenSettings: (cb: () => void) => {
+      const handler = () => cb();
+      ipcRenderer.on('window:open-settings', handler);
+      return () => ipcRenderer.removeListener('window:open-settings', handler);
+    },
   },
 };
 

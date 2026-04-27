@@ -3,6 +3,8 @@ import {
   persistDelete,
   persistFind,
   persistGetAll,
+  persistGetAllPaginated,
+  persistMergeAll,
   persistGetOne,
   persistReplaceAll,
   persistUpsert,
@@ -11,7 +13,9 @@ import {
   type PersistMatchMode,
 } from '../persist/store';
 
-export function registerPersistHandlers(): void {
+export function registerPersistHandlers(
+  onMutation?: (collection: PersistCollection) => void
+): void {
   ipcMain.handle(
     'persist:get-all',
     (_event, { collection }: { collection: PersistCollection }) =>
@@ -20,8 +24,10 @@ export function registerPersistHandlers(): void {
 
   ipcMain.handle(
     'persist:get-one',
-    (_event, { collection, id }: { collection: PersistCollection; id: string }) =>
-      persistGetOne(collection, id)
+    (
+      _event,
+      { collection, id }: { collection: PersistCollection; id: string }
+    ) => persistGetOne(collection, id)
   );
 
   ipcMain.handle(
@@ -53,7 +59,11 @@ export function registerPersistHandlers(): void {
         id: string;
         value: Record<string, unknown>;
       }
-    ) => persistUpsert(collection, id, value)
+    ) =>
+      persistUpsert(collection, id, value).then(result => {
+        onMutation?.(collection);
+        return result;
+      })
   );
 
   ipcMain.handle(
@@ -69,7 +79,11 @@ export function registerPersistHandlers(): void {
         filters: PersistFilter[];
         matchMode: PersistMatchMode;
       }
-    ) => persistDelete(collection, filters, matchMode)
+    ) =>
+      persistDelete(collection, filters, matchMode).then(result => {
+        onMutation?.(collection);
+        return result;
+      })
   );
 
   ipcMain.handle(
@@ -83,6 +97,42 @@ export function registerPersistHandlers(): void {
         collection: PersistCollection;
         values: Record<string, unknown>[];
       }
-    ) => persistReplaceAll(collection, values)
+    ) =>
+      persistReplaceAll(collection, values).then(() => {
+        onMutation?.(collection);
+      })
+  );
+
+  ipcMain.handle(
+    'persist:merge-all',
+    (
+      _event,
+      {
+        collection,
+        values,
+      }: {
+        collection: PersistCollection;
+        values: Record<string, unknown>[];
+      }
+    ) =>
+      persistMergeAll(collection, values).then(() => {
+        onMutation?.(collection);
+      })
+  );
+
+  ipcMain.handle(
+    'persist:get-all-paginated',
+    (
+      _event,
+      {
+        collection,
+        page,
+        pageSize,
+      }: {
+        collection: PersistCollection;
+        page: number;
+        pageSize: number;
+      }
+    ) => persistGetAllPaginated(collection, page, pageSize)
   );
 }

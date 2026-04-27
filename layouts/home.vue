@@ -2,8 +2,8 @@
 import { cn } from '@/lib/utils';
 import { isDesktopApp, isMacOS, isPWA, isElectron } from '~/core/helpers';
 
-const isAppVersion = computed(() => isDesktopApp() || isPWA());
 const isDesktopMacWindow = computed(() => isDesktopApp() && isMacOS());
+const config = useRuntimeConfig();
 
 const onTitleBarDoubleClick = async () => {
   if (!isDesktopMacWindow.value) {
@@ -14,6 +14,9 @@ const onTitleBarDoubleClick = async () => {
     await (window as any).electronAPI.window.maximize();
   }
 };
+
+const isAppVersion = computed(() => isElectron() || isPWA());
+const githubLink = config.public.githubLink;
 </script>
 
 <template>
@@ -36,11 +39,11 @@ const onTitleBarDoubleClick = async () => {
 
         <p class="text-xl font-medium">orcaq</p>
       </div>
+      v{{ config.public.version }}
     </div>
-    {{ 'show 1.0.41 → 1.0.42' }}
   </div>
 
-  <div class="h-screen overflow-y-auto flex flex-col">
+  <div class="h-full overflow-y-auto flex flex-col">
     <div
       v-if="!isAppVersion"
       class="flex items-center justify-between border-b border-border py-2 px-2"
@@ -53,11 +56,20 @@ const onTitleBarDoubleClick = async () => {
         <p class="text-2xl font-medium">orcaq</p>
       </div>
 
+      <div>
+        <Button variant="outline" size="sm" as-child>
+          <a :href="githubLink" target="_blank">
+            <Icon name="hugeicons:github" class="w-5 h-5" /> Star us on GitHub
+            ⭐️
+          </a>
+        </Button>
+      </div>
       <!-- <Avatar>
       <AvatarImage src="https://github.com/unovue.png" alt="@unovue" />
       <AvatarFallback>CN</AvatarFallback>
     </Avatar> -->
     </div>
+
     <slot />
   </div>
 </template>

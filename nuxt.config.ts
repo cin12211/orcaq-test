@@ -42,6 +42,7 @@ const devWatchIgnored = [
   '**/.nuxt/**',
   '**/.output/**',
   '**/.data/**',
+  '**/.sqlite3/**',
   '**/.cache/**',
   '**/.vite/**',
   '**/dist/**',
@@ -65,6 +66,10 @@ const devWatchOptions = {
   ignored: devWatchIgnored,
 };
 
+const sqlite3ConnectionsEnabled =
+  process.env.NUXT_PUBLIC_SQLITE3_CONNECTIONS_ENABLED !== 'false' &&
+  process.env.NUXT_PUBLIC_SQLITE3_CONNECTIONS_ENABLED !== '0';
+
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
 
@@ -79,8 +84,17 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       amplitudeApiKey: process.env.NUXT_AMPLITUDE_API_KEY,
+      ggFormLink: process.env.NUXT_GG_FORM_LINK,
+      githubLink:
+        process.env.NUXT_GITHUB_LINK ?? 'https://github.com/cin12211/orca-q',
       isDev: process.env.NODE_ENV !== 'production',
+      sqlite3ConnectionsEnabled,
       version: pkg.version,
+      showDownloadBanner:
+        process.env.NUXT_PUBLIC_SHOW_DOWNLOAD_BANNER === 'true',
+      downloadLink:
+        process.env.NUXT_PUBLIC_DOWNLOAD_LINK ??
+        'https://github.com/cin12211/orca-q/releases',
     },
   },
 
@@ -153,6 +167,6 @@ export default defineNuxtConfig({
   watchers: {
     chokidar: devWatchOptions,
   },
-  ignore: ['**/docs/**'],
+  ignore: ['**/docs/**', '**/.sqlite3/**'],
   spaLoadingTemplate: true,
 });

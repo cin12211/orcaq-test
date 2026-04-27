@@ -3,18 +3,10 @@
  * All calls go through window.electronAPI.persist (contextBridge).
  */
 import dayjs from 'dayjs';
-import { toRawJSON } from '~/core/helpers';
+import { toRawJSON } from '~/core/helpers/jsonFormat';
+import type { PersistCollection } from '~/core/storage/idbRegistry';
 
-export type PersistCollection =
-  | 'appConfig'
-  | 'agentState'
-  | 'workspaces'
-  | 'workspaceState'
-  | 'connections'
-  | 'tabViews'
-  | 'quickQueryLogs'
-  | 'rowQueryFiles'
-  | 'rowQueryFileContents';
+export type { PersistCollection };
 
 export interface PersistFilter {
   field: string;
@@ -52,6 +44,7 @@ function api() {
       collection: PersistCollection,
       values: T[]
     ) => Promise<void>;
+    mergeAll: <T>(collection: PersistCollection, values: T[]) => Promise<void>;
   };
 }
 
@@ -86,6 +79,12 @@ export const persistReplaceAll = <T>(
   values: T[]
 ): Promise<void> =>
   api().replaceAll<T>(collection, values.map(v => toRawJSON(v)) as T[]);
+
+export const persistMergeAll = <T>(
+  collection: PersistCollection,
+  values: T[]
+): Promise<void> =>
+  api().mergeAll<T>(collection, values.map(v => toRawJSON(v)) as T[]);
 
 export const sortByCreatedAt = <T extends { createdAt?: string }>(
   values: T[]

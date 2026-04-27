@@ -3,11 +3,12 @@ name: Tag Release Pipeline
 on:
   workflow_dispatch:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
 
 permissions:
   contents: read
+  id-token: write  # Required for OIDC
 
 concurrency:
   group: release-${{ github.ref_name || github.run_id }}
@@ -34,25 +35,9 @@ jobs:
         id: release
         shell: bash
         run: |
-          TAG="${GITHUB_REF_NAME}"
+          VERSION="$(node -p "require('./package.json').version")"
 
-          if [[ ! "$TAG" =~ ^v[0-9].* ]]; then
-            echo "Invalid release tag: $TAG"
-            exit 1
-          fi
-
-          VERSION="${TAG#v}"
-          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
-
-          echo "Detected tag: $TAG"
           echo "Detected version: $VERSION"
-          echo "package.json version: $PACKAGE_VERSION"
-
-          if [ "$PACKAGE_VERSION" != "$VERSION" ]; then
-            echo "package.json version must match tag version."
-            exit 1
-          fi
-
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
@@ -91,7 +76,7 @@ jobs:
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/orcaq:buildcache,mode=max
 
       - name: Docker release summary
-        run: echo "Docker image pushed: ${{ secrets.DOCKERHUB_USERNAME }}/orcaq:${{ needs.prepare-release.outputs.version }}"
+        run: echo "Docker image pushed ${{ secrets.DOCKERHUB_USERNAME }}/orcaq:${{ needs.prepare-release.outputs.version }}"
 
   npx-package-build-publish:
     name: Build and publish NPX package
@@ -106,7 +91,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          registry-url: https://registry.npmjs.org
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install Bun
         uses: oven-sh/setup-bun@v2
@@ -115,6 +100,9 @@ jobs:
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
+
+      - name: Update npm to latest version for OIDC support
+        run: npm install -g npm@latest
 
       - name: Build NPX package bundle
         run: npm run npx:build
@@ -132,9 +120,7 @@ jobs:
 
       - name: Publish to npm
         working-directory: npx-package
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --provenance
 
       - name: NPM release summary
         run: echo "Published npm package orcaq@${{ needs.prepare-release.outputs.version }}"
