@@ -189,9 +189,9 @@ This is the easiest part to misunderstand.
 The SQL fixture files live on the local filesystem:
 
 - [test/fixtures/datasets/postgres/postgres-sakila-schema.sql](/Volumes/Cinny/Cinny/Project/HeraQ/test/fixtures/datasets/postgres/postgres-sakila-schema.sql:1)
-- [test/fixtures/datasets/postgres/postgres-sakila-insert-data-using-copy.sql](/Volumes/Cinny/Cinny/Project/HeraQ/test/fixtures/datasets/postgres/postgres-sakila-insert-data-using-copy.sql:1)
+- [test/fixtures/datasets/postgres/postgres-sakila-insert-data-optimized.sql](/Volumes/Cinny/Cinny/Project/HeraQ/test/fixtures/datasets/postgres/postgres-sakila-insert-data-optimized.sql:1)
 - [test/fixtures/datasets/mysql/mysql-sakila-schema.sql](/Volumes/Cinny/Cinny/Project/HeraQ/test/fixtures/datasets/mysql/mysql-sakila-schema.sql:1)
-- [test/fixtures/datasets/mysql/mysql-sakila-insert-data.sql](/Volumes/Cinny/Cinny/Project/HeraQ/test/fixtures/datasets/mysql/mysql-sakila-insert-data.sql:1)
+- [test/fixtures/datasets/mysql/mysql-sakila-insert-data-optimized.sql](/Volumes/Cinny/Cinny/Project/HeraQ/test/fixtures/datasets/mysql/mysql-sakila-insert-data-optimized.sql:1)
 
 However, the actual schema and data import happens inside the database containers, because the Compose file mounts those files into:
 
@@ -280,13 +280,13 @@ That script connects to the Redis container through the published port.
 
 Source: [scripts/test-services/prepare-sample-data.sh](/Volumes/Cinny/Cinny/Project/HeraQ/scripts/test-services/prepare-sample-data.sh:1)
 
-SQLite does not use a Docker container.
+This script prepares local sample assets before the SQL fixtures boot:
 
-The flow is:
-
-1. read schema SQL and data SQL from `test/fixtures/datasets/sqlite`
-2. create a sample SQLite file in the `.tmp` directory
-3. let Playwright or app tests use that file as a local database sample
+1. read raw `*-sakila-insert-data.sql` files for MySQL, Oracle, SQL Server, and SQLite
+2. keep the PostgreSQL optimized fixture at `test/fixtures/datasets/postgres/postgres-sakila-insert-data-optimized.sql`
+3. generate matching `*-sakila-insert-data-optimized.sql` files for MySQL, Oracle, SQL Server, and SQLite
+4. build the local SQLite sample file from the optimized SQLite dataset
+5. let Playwright or app tests use the optimized fixture data and generated SQLite sample
 
 ## Diagram: Full Test Orchestration
 

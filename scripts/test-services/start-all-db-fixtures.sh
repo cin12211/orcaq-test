@@ -4,7 +4,7 @@ set -euo pipefail
 
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-echo "Preparing local SQLite sample"
+echo "Preparing local sample data"
 bash "${script_dir}/prepare-sample-data.sh"
 
 echo "Starting SQL fixtures"

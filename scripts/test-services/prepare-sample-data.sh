@@ -9,7 +9,15 @@ sqlite_source_dir="${dataset_root}/sqlite"
 sqlite_output_dir="${dataset_root}/.tmp/sqlite"
 sqlite_output_file="${sqlite_output_dir}/sakila.sqlite"
 sqlite_schema_file="${sqlite_source_dir}/sqlite-sakila-schema.sql"
-sqlite_data_file="${sqlite_source_dir}/sqlite-sakila-insert-data.sql"
+sqlite_data_file="${sqlite_source_dir}/sqlite-sakila-insert-data-optimized.sql"
+mysql_source_dir="${dataset_root}/mysql"
+mysql_optimized_output_file="${mysql_source_dir}/mysql-sakila-insert-data-optimized.sql"
+oracle_source_dir="${dataset_root}/oracle"
+oracle_optimized_output_file="${oracle_source_dir}/oracle-sakila-insert-data-optimized.sql"
+postgres_source_dir="${dataset_root}/postgres"
+postgres_optimized_output_file="${postgres_source_dir}/postgres-sakila-insert-data-optimized.sql"
+sql_server_source_dir="${dataset_root}/sql-server"
+sql_server_optimized_output_file="${sql_server_source_dir}/sql-server-sakila-insert-data-optimized.sql"
 
 resolve_container_cmd() {
   if command -v podman >/dev/null 2>&1 && podman info >/dev/null 2>&1; then
@@ -49,7 +57,7 @@ import sqlite3
 
 repo_root = Path('/workspace/repo')
 schema_file = repo_root / 'test/fixtures/datasets/sqlite/sqlite-sakila-schema.sql'
-data_file = repo_root / 'test/fixtures/datasets/sqlite/sqlite-sakila-insert-data.sql'
+data_file = repo_root / 'test/fixtures/datasets/sqlite/sqlite-sakila-insert-data-optimized.sql'
 output_file = repo_root / 'test/fixtures/datasets/.tmp/sqlite/sakila.sqlite'
 
 output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -76,6 +84,23 @@ prepare_sqlite_sample() {
   build_sqlite_with_container
 }
 
+prepare_optimized_sql_fixtures() {
+  echo 'Preparing optimized SQL fixture data'
+
+  node "${script_dir}/generate-optimized-sql-fixtures.mjs"
+
+  require_file "${postgres_optimized_output_file}"
+  require_file "${mysql_optimized_output_file}"
+  require_file "${oracle_optimized_output_file}"
+  require_file "${sql_server_optimized_output_file}"
+  require_file "${sqlite_data_file}"
+}
+
+prepare_optimized_sql_fixtures
 prepare_sqlite_sample
 
+echo "PostgreSQL optimized fixture is ready at ${postgres_optimized_output_file}"
+echo "MySQL optimized fixture is ready at ${mysql_optimized_output_file}"
+echo "Oracle optimized fixture is ready at ${oracle_optimized_output_file}"
+echo "SQL Server optimized fixture is ready at ${sql_server_optimized_output_file}"
 echo "SQLite sample is ready at ${sqlite_output_file}"
